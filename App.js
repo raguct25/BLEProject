@@ -24,14 +24,14 @@ class App extends Component {
       scanning: false
     };
   }
-  componentWillMount(){
+  componentWillMount() {
     BleManager.enableBluetooth()
-  .then(() => {
-    console.log('The bluetooth is already enabled or the user confirm');
-  })
-  .catch((error) => {
-    console.log('The user refuse to enable bluetooth');
-  });
+      .then(() => {
+        console.log("The bluetooth is already enabled or the user confirm");
+      })
+      .catch(error => {
+        console.log("The user refuse to enable bluetooth");
+      });
   }
 
   componentDidMount() {
@@ -76,24 +76,27 @@ class App extends Component {
   }
 
   handleScan() {
+    this.setState({
+      ble: []
+    });
     BleManager.scan([], 2, true).then(results => {
       console.log("Scanning...");
     });
   }
 
-  toggleScanning=(bool)=> {
+  toggleScanning = bool => {
     if (bool) {
       this.setState({ scanning: true });
-      this.handleScan()
+      this.handleScan();
     } else {
       this.setState({ scanning: false, ble: [] });
     }
-  }
+  };
 
   handleDiscoverPeripheral(data) {
     console.log("Got ble data");
 
-    if(this.state.ble.indexOf(data) ===-1){
+    if (this.state.ble.indexOf(data) === -1) {
       console.log("Got ud ", this.state.ble.indexOf(data));
       this.setState({ ble: [...this.state.ble, data] }, () => {
         console.log(this.state.ble);
@@ -101,22 +104,26 @@ class App extends Component {
     }
   }
 
-  connectToPheripherial=(peripheral)=>{
-    console.log('ID',peripheral.id);
-      BleManager.connect(peripheral.id)
-    .then((data) => {
-      console.log('Connected', data);
-      BleManager.retrieveServices(peripheral.id).then(peripheralInfo => {
-        console.log("Peripheral info:", peripheralInfo);
+  connectToPheripherial = peripheral => {
+    console.log("ID", peripheral.id);
+    BleManager.connect(peripheral.id)
+      .then(data => {
+        console.log("Connected", data);
+        BleManager.retrieveServices(peripheral.id)
+          .then(peripheralInfo => {
+            console.log("Peripheral info:", peripheralInfo);
+          })
+          .catch(error => {
+            Alert.alert(
+              "Err..",
+              "Something went wrong while trying to connect."
+            );
+          });
       })
       .catch(error => {
-        Alert.alert("Err..", "Something went wrong while trying to connect.");
+        console.log(error);
       });
-    })
-    .catch((error) => {
-      console.log(error);
-    });
-  }
+  };
 
   render() {
     const container = {
@@ -126,21 +133,22 @@ class App extends Component {
       backgroundColor: "#F5FCFF"
     };
 
-    const bleList = this.state.ble.length > 0 ?(
-
-      this.state.ble.map((value,i)=>(
-        <TouchableOpacity  key={i} onPress={()=> this.connectToPheripherial(value)}
-          style={{ padding: 20, backgroundColor: "blue",  margin:10 }}>
-        <Text> Device found: {value.name} </Text>
-        </TouchableOpacity>
-      ))
-    ) : (
-
-      <Text>no devices nearby</Text>
-    );
+    const bleList =
+      this.state.ble.length > 0 ? (
+        this.state.ble.map((value, i) => (
+          <TouchableOpacity
+            key={i}
+            onPress={() => this.connectToPheripherial(value)}
+            style={{ padding: 20, backgroundColor: "blue", margin: 10 }}
+          >
+            <Text style={{ color: "white" }}> Device found: {value.name} </Text>
+          </TouchableOpacity>
+        ))
+      ) : (
+        <Text>no devices nearby</Text>
+      );
 
     return (
-
       <View style={container}>
         <TouchableHighlight
           style={{ padding: 20, backgroundColor: "#ccc" }}
@@ -148,11 +156,8 @@ class App extends Component {
         >
           <Text>Scan Bluetooth ({this.state.scanning ? "on" : "off"})</Text>
         </TouchableHighlight>
-        <ScrollView>
-        {bleList}
-        </ScrollView>
+        <ScrollView>{bleList}</ScrollView>
       </View>
-
     );
   }
 }
