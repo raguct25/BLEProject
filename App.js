@@ -5,6 +5,7 @@ import {
   TouchableHighlight,
   NativeEventEmitter,
   Platform,
+  ScrollView,
   Alert,
   NativeModules,
   TouchableOpacity,
@@ -26,11 +27,9 @@ class App extends Component {
   componentWillMount(){
     BleManager.enableBluetooth()
   .then(() => {
-    // Success code
     console.log('The bluetooth is already enabled or the user confirm');
   })
   .catch((error) => {
-    // Failure code
     console.log('The user refuse to enable bluetooth');
   });
   }
@@ -77,8 +76,7 @@ class App extends Component {
   }
 
   handleScan() {
-
-    BleManager.scan([], 3, true).then(results => {
+    BleManager.scan([], 2, true).then(results => {
       console.log("Scanning...");
     });
   }
@@ -94,8 +92,9 @@ class App extends Component {
 
   handleDiscoverPeripheral(data) {
     console.log("Got ble data");
+
     if(this.state.ble.indexOf(data) ===-1){
-      console.log("Got ud ");
+      console.log("Got ud ", this.state.ble.indexOf(data));
       this.setState({ ble: [...this.state.ble, data] }, () => {
         console.log(this.state.ble);
       });
@@ -104,12 +103,9 @@ class App extends Component {
 
   connectToPheripherial=(peripheral)=>{
     console.log('ID',peripheral.id);
-
       BleManager.connect(peripheral.id)
     .then((data) => {
-      // Success code
       console.log('Connected', data);
-
       BleManager.retrieveServices(peripheral.id).then(peripheralInfo => {
         console.log("Peripheral info:", peripheralInfo);
       })
@@ -118,11 +114,8 @@ class App extends Component {
       });
     })
     .catch((error) => {
-      // Failure code
       console.log(error);
     });
-    
-
   }
 
   render() {
@@ -147,6 +140,7 @@ class App extends Component {
     );
 
     return (
+
       <View style={container}>
         <TouchableHighlight
           style={{ padding: 20, backgroundColor: "#ccc" }}
@@ -154,8 +148,11 @@ class App extends Component {
         >
           <Text>Scan Bluetooth ({this.state.scanning ? "on" : "off"})</Text>
         </TouchableHighlight>
+        <ScrollView>
         {bleList}
+        </ScrollView>
       </View>
+
     );
   }
 }
