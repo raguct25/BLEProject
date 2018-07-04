@@ -3,6 +3,8 @@ package com.bleproject;
 import android.app.Application;
 
 import com.facebook.react.ReactApplication;
+import im.shimo.react.prompt.RNPromptPackage;
+import com.react.rnspinkit.RNSpinkitPackage;
 import it.innove.BleManagerPackage;
 import com.facebook.react.ReactNativeHost;
 import com.facebook.react.ReactPackage;
@@ -24,6 +26,8 @@ public class MainApplication extends Application implements ReactApplication {
     protected List<ReactPackage> getPackages() {
       return Arrays.<ReactPackage>asList(
           new MainReactPackage(),
+            new RNPromptPackage(),
+            new RNSpinkitPackage(),
             new BleManagerPackage()
       );
     }
